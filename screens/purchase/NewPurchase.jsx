@@ -13,24 +13,64 @@ import React, {useEffect, useRef, useState} from 'react';
 import {Picker} from '@react-native-picker/picker';
 import {RadioButton, Button as But} from 'react-native-paper';
 import {Camera, useCameraDevice} from 'react-native-vision-camera';
+import { useDispatch, useSelector } from 'react-redux';
+import { addPhotoUri, getDropdownDetails, PurchaseDetail } from '../../features/purchase/purchaseSlice';
+import Loader from '../Loader';
 const NewPurchase = ({navigation}) => {
+  const dispatch=useDispatch();
+  const {dropdownDetails,isLoading } = useSelector(state => state.purchase);
+  const {orderData } = useSelector(state => state.purchase);
+  const {purchaseDetail } = useSelector(state => state.purchase.orderData);
   const [selectedLanguage, setSelectedLanguage] = useState();
-  const [selectedProcurementMode, setSelectedProcurementMode] = useState();
-  const [selectedStartMeter, setSelectedStartMeter] = useState();
-  const [selectedEndMeter, setSelectedEndMeter] = useState();
+  const [selectedProcurementMode, setSelectedProcurementMode] = useState(purchaseDetail?.procurementMode );
+  const [supplier, setSupplier] = useState(purchaseDetail?.supplierId);
+  const [driver, setDriver] = useState(purchaseDetail?.driver);
+  const [vehicle, setVehicle] = useState(purchaseDetail?.vehicle);
+  const [selectedStartMeter, setSelectedStartMeter] = useState(purchaseDetail?.startMeterReading);
+  const [selectedEndMeter, setSelectedEndMeter] = useState(purchaseDetail?.endMeterReading);
   const [photoOption, setPhotoOption] = useState(true);
-  const [photoUri, setPhotoUri] = useState(null);
+  const [photoUri, setPhotoUri] = useState(purchaseDetail?.photoUri?purchaseDetail.photoUri:null);
   const cameraRef = useRef();
   const [startCamera, setStartCamera] = useState(false);
-
+ 
   useEffect(() => {
     checkPermission();
   }, []);
+  useEffect(() => {
+    console.log(vehicle)
+  }, [vehicle]);
+  useEffect(() => {
+    dispatch(getDropdownDetails());
+    // console.log('dropdownDetails',dropdownDetails)
+    console.log('orderData',orderData)
+    // console.log('dropdownDetails',dropdownDetails)
+    // console.log('purchaseDetail?.supplierId',purchaseDetail?.supplierId)
+    console.log('dropdownDetails?.supplier[0]',dropdownDetails.supplier?dropdownDetails.supplier[0].supplier_id:null)
+  }, [dispatch]);
+  useEffect(() => {
+    // Set default values when dropdownDetails are fetched
+    if (dropdownDetails?.supplier?.length > 0 && !supplier) {
+      setSupplier(dropdownDetails.supplier[0].supplier_id);
+    }
+    if (dropdownDetails?.driver?.length > 0 && !driver) {
+      setDriver(dropdownDetails.driver[0].driver_id);
+    }
+    if (dropdownDetails?.vehicle?.length > 0 && !vehicle) {
+      setVehicle(dropdownDetails.vehicle[0].vehicle_id);
+    }
+  }, [dropdownDetails]);
+  
   const checkPermission = async () => {
     const newCameraPermission = await Camera.requestCameraPermission();
     console.log(newCameraPermission);
   };
-  const device = useCameraDevice('front');
+ 
+  const device = useCameraDevice('back');
+
+  if(isLoading){
+    return <Loader/>;
+    
+  }
   const handleStartMeterChange = e => {
     setSelectedStartMeter(e);
   };
@@ -47,10 +87,42 @@ const NewPurchase = ({navigation}) => {
         const result = await fetch(`file://${photo.path}`);
         const filePath = photo.path;
         setPhotoUri(photo.path);
+        dispatch(addPhotoUri(photo.path))
         setStartCamera(false);
       } catch (err) {
         console.error('Failed to take photo', err);
       }
+    }
+  };
+  const handleVehicle = (e)=>{
+    setVehicle(e)
+    console.log(vehicle)
+  }
+  const nextPage = () => {
+    if (selectedProcurementMode == 1) {
+      const data = {
+        supplierId: supplier,
+        // selectedSupplierId: selectedSupplierId,
+        procurementMode: selectedProcurementMode,
+        driver: driver,
+        vehicle: vehicle,
+        startMeterReading: selectedStartMeter,
+        endMeterReading: selectedEndMeter,
+        photoUri: photoUri,
+      };
+
+      dispatch(PurchaseDetail(data));
+      navigation.navigate('PurchaseMaterial')
+
+    } else {
+      const data = {
+        supplierId: supplier,
+        procurementMode: selectedProcurementMode,
+        vehicle: vehicle,
+      };
+
+      dispatch(PurchaseDetail(data));
+      navigation.navigate('PurchaseMaterial')
     }
   };
   return (
@@ -61,25 +133,27 @@ const NewPurchase = ({navigation}) => {
             <View className=" m-4">
               <View className="flex-row justify-between items-center ">
                 <Text className="font-extrabold text-lg">Supplier</Text>
-                <TouchableOpacity>
+                <TouchableOpacity >
                   <Button
                     className="bg-green-500"
                     title="New Supplier"
                     color="#22c55e"
                     onPress={() => {
-                      // Handle new supplier creation
+                      navigation.navigate('NewSupplier')
                     }}
                   />
                 </TouchableOpacity>
               </View>
               <View className="border-b mt-2">
                 <Picker
-                  selectedValue={selectedLanguage}
+                  selectedValue={supplier}
                   onValueChange={(itemValue, itemIndex) =>
-                    setSelectedLanguage(itemValue)
+                    setSupplier(itemValue)
                   }>
-                  <Picker.Item label="Java" value="java" />
-                  <Picker.Item label="JavaScript" value="js" />
+                  {dropdownDetails.supplier &&dropdownDetails.supplier.map((item) => (
+          <Picker.Item key={item.supplier_id} label={item.supplier_name} value={item.supplier_id} />
+          // Assuming each item has an `id` and `name` property; adjust accordingly
+        ))}
                 </Picker>
               </View>
               <View className="mt-10">
@@ -113,12 +187,14 @@ const NewPurchase = ({navigation}) => {
                     <View className="border-b mt-2">
                       <Text className="text-lg font-semibold">Driver Name</Text>
                       <Picker
-                        selectedValue={selectedLanguage}
+                        selectedValue={driver}
                         onValueChange={(itemValue, itemIndex) =>
-                          setSelectedLanguage(itemValue)
+                          setDriver(itemValue)
                         }>
-                        <Picker.Item label="Java" value="java" />
-                        <Picker.Item label="JavaScript" value="js" />
+                      {dropdownDetails.driver && dropdownDetails.driver.map((item) => (
+          <Picker.Item key={item.driver_id} label={item.driver_name} value={item.driver_id} />
+          // Assuming each item has an `id` and `name` property; adjust accordingly
+        ))}
                       </Picker>
                     </View>
                     <View className="border-b mt-3">
@@ -126,12 +202,14 @@ const NewPurchase = ({navigation}) => {
                         Vehicle Number
                       </Text>
                       <Picker
-                        selectedValue={selectedLanguage}
+                        selectedValue={vehicle}
                         onValueChange={(itemValue, itemIndex) =>
-                          setSelectedLanguage(itemValue)
+                          setVehicle(itemValue)
                         }>
-                        <Picker.Item label="Java" value="java" />
-                        <Picker.Item label="JavaScript" value="js" />
+                        {dropdownDetails.vehicle && dropdownDetails.vehicle.map((item) => (
+          <Picker.Item key={item.vehicle_id} label={item.vehicle_number} value={item.vehicle_id} />
+          // Assuming each item has an `id` and `name` property; adjust accordingly
+        ))}
                       </Picker>
                     </View>
                     <View className=" mt-3">
@@ -202,6 +280,17 @@ const NewPurchase = ({navigation}) => {
                   )}
                 </View>
               )}
+                {selectedProcurementMode == '2' && (
+                  <View className="mt-10">
+                  <View>
+                    <Text className="font-extrabold text-lg">
+                      Vehicle Number
+                    </Text>
+                    <TextInput className='border mt-3'
+                     value={vehicle}   onChangeText={handleVehicle}     />
+                  </View>
+                  </View>
+                )}
             </View>
           </ScrollView>
           <View>
@@ -212,7 +301,7 @@ font-bold rounded w-full "
                 textColor="white"
                 disabled={!selectedProcurementMode}
                 title=""
-                onPress={()=>navigation.navigate('PurchaseMaterial')}
+                onPress={nextPage}
                 >
                 Next {'>'}
               </But>

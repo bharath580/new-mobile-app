@@ -5,22 +5,99 @@ import {
   TouchableOpacity,
   TextInput,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {RadioButton, Button} from 'react-native-paper';
 import {Picker} from '@react-native-picker/picker';
+import { useDispatch, useSelector } from 'react-redux';
+import { addMaterial, getDropdownDetails } from '../../features/purchase/purchaseSlice';
+import Loader from '../Loader';
 
-const Material = () => {
-  const [materialDetails, setMaterialDetails] = useState([
-    {material: '', quantity: '', sacks: ''},
-  ]);
+const Material = ({navigation}) => {
+  const dispatch=useDispatch();
+  const {orderData } = useSelector(state => state.purchase);
+
+  const {dropdownDetails,isLoading } = useSelector(state => state.purchase);
+  
+ 
+  
+  const [materialDetails, setMaterialDetails] = useState(!orderData.materials
+    ? [{material: dropdownDetails?.material[0]?.purchase_material_id, quantity: '', sacks: ''}]
+    : orderData.materials);
+    useEffect(() => {
+      dispatch(getDropdownDetails());
+      console.log('dropdownDetails',dropdownDetails)
+      console.log('orderData',orderData)
+  
+    }, [dispatch]);
+    // useEffect(()=>{
+    //   console.log('triggered')
+    //    if(dropdownDetails.material.length>0 && !dropdownDetails.material){
+    //     setMaterialDetails(prev=>({
+    //       ...prev,material:dropdownDetails.material[0].purchase_material_id
+    //     }))
+    //    }
+    // },[dropdownDetails])
+    // useEffect(() => {
+    //   if (dropdownDetails?.material?.length > 0) {
+    //     setMaterialDetails(prevDetails =>
+    //       prevDetails.map(detail => ({
+    //         ...detail,
+    //         material: detail.material || dropdownDetails.material[0].purchase_material_id, // Set default material
+    //       }))
+    //     );
+    //   }
+    // }, [dropdownDetails]);
+    
+  if(isLoading){
+    return <Loader/>;
+    
+  }
+  const handleMaterialChange = (value, index) => {
+    console.log('value', value);
+    setMaterialDetails(prevDetails => {
+      const updatedDetails = [...prevDetails];
+      updatedDetails[index].material = value;
+      return updatedDetails;
+    });
+    // dispatch(addMaterial(materialDetails))
+  };
+
+  const handleQuantityChange = (value, index) => {
+    setMaterialDetails(prevDetails => {
+      const updatedDetails = [...prevDetails];
+      updatedDetails[index].quantity = value;
+      return updatedDetails;
+    });
+  };
+  const handleSacksChange = (value, index) => {
+    setMaterialDetails(prevDetails => {
+      const updatedDetails = [...prevDetails];
+      updatedDetails[index].sacks = value;
+      return updatedDetails;
+    });
+  };
 
   const addMaterialBox = () => {
-    setMaterialDetails(preDetail => [
-      ...preDetail,
-      {material: '', quantity: '', sacks: ''},
+    const defaultMaterial = dropdownDetails?.material?.[0]?.purchase_material_id || ''; // Get the first material ID as default
+    setMaterialDetails(prevDetails => [
+      ...prevDetails,
+      { material: defaultMaterial, quantity: '', sacks: '' }, // Use defaultMaterial
     ]);
   };
+  
+  const handleNextPage = () => {
+    dispatch(addMaterial(materialDetails));
+    navigation.navigate('PurchaseConfirm');
+  };
+  const handleDelete = index => {
+    const updatedDetails = [...materialDetails];
+    updatedDetails.splice(index, 1);
+    setMaterialDetails(updatedDetails);
+  };
+
   const renderMaterialBoxes = () => {
+    const defaultMaterial =
+    dropdownDetails?.material?.[0]?.purchase_material_id || '';
     return materialDetails.map((item, index) => (
       <View
         key={index}
@@ -37,18 +114,20 @@ const Material = () => {
               <Button
                 icon="delete"
                 mode="contained"
-                // onPress={() => handleDelete(index)}
+                onPress={() => handleDelete(index)}
               >
                 Delete
               </Button>
             )}
           </View>
           <Picker
-          // selectedValue={item.material}
-          // onValueChange={value => handleMaterialChange(value, index)}
+          selectedValue={item.material}
+          onValueChange={value => handleMaterialChange(value, index)}
           >
-            <Picker.Item label="Java" value="java" />
-            <Picker.Item label="JavaScript" value="js" />
+            {dropdownDetails.material && dropdownDetails.material.map((item) => (
+          <Picker.Item key={item.purchase_material_id} label={item.material_name} value={item.purchase_material_id} />
+          // Assuming each item has an `id` and `name` property; adjust accordingly
+        ))}
           </Picker>
         </View>
 
@@ -56,9 +135,9 @@ const Material = () => {
           <Text className="text-lg font-semibold">Quantity(kg)</Text>
           <TextInput
             className="border mt-2 h-10 pl-2"
-            // value={item.quantity}
+            value={item.quantity}
             keyboardType="numeric"
-            // onChangeText={value => handleQuantityChange(value, index)}
+            onChangeText={value => handleQuantityChange(value, index)}
           />
         </View>
 
@@ -67,8 +146,8 @@ const Material = () => {
           <TextInput
             className="border mt-2 h-10 pl-2"
             keyboardType="numeric"
-            // value={item.sacks}
-            // onChangeText={value => handleSacksChange(value, index)}
+            value={item.sacks}
+            onChangeText={value => handleSacksChange(value, index)}
           />
         </View>
       </View>
@@ -102,7 +181,7 @@ const Material = () => {
         <Button
           className="bg-green-500 text-lg
          font-bold py-2 px-3 rounded w-full "
-          textColor="white">
+          textColor="white" onPress={handleNextPage}>
           Next {'>'}
         </Button>
       </TouchableOpacity>
