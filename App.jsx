@@ -59,6 +59,7 @@ import SupplierDetail from './screens/supplier/SupplierDetail';
 import NewBuyer from './screens/buyer/NewBuyer';
 import BuyerDetail from './screens/buyer/BuyerDetail';
 import SaleMaterial from './screens/sale/SaleMaterial';
+import PurchaseDetail from './screens/purchase/PurchaseDetail';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -152,7 +153,7 @@ export default function App() {
                 {props => <HomeDrawer {...props} logout={logout} />}
               </Stack.Screen>
               <Stack.Screen name="Purchase" component={PurchaseList} />
-              {/* <Stack.Screen name="PurchaseDetail" component={PurchaseDetail} /> */}
+              <Stack.Screen name="PurchaseDetail" component={PurchaseDetail} />
               <Stack.Screen
                 name="NewPurchase"
                 component={NewPurchase}
