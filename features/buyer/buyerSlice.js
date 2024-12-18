@@ -5,37 +5,38 @@ import axios from "axios";
 const initialState={
     isLoading:false,
     isError:false,
-    supplierList:[],
-    supplierById:[],
+    buyerList:[],
+    buyerById:[],
     orderData:[],
-    supplierPostData:[],
+    buyerPostData:[],
     message: ""
 }
-export const getSupplierList=createAsyncThunk('supplier/supplierList',async(_,thunkApi)=>{
+export const getBuyerList=createAsyncThunk('buyer/buyerList',async(_,thunkApi)=>{
     try{
-        const response = await api.get('supplier');
+        const response = await api.get('buyer');
         return response.data;
     }
     catch(e){
         return thunkApi.rejectWithValue(e.message)
     }
 })
-export const supplierPost=createAsyncThunk('supplier/supplierPost',async(data,thunkApi)=>{
+export const buyerPost=createAsyncThunk('buyer/buyerPost',async(data,thunkApi)=>{
     try{
-        console.log('data',data.data.supplier_image)
+        console.log('data',data)
+     
         const formData = new FormData();
         formData.append("data", JSON.stringify(data));
-        if (data.data.supplier_image) {
+        if (data.data.buyer_image) {
           console.log('............................')
-          formData.append('supplier_image', {
-            uri: `file://${data.data.supplier_image}`,
+          formData.append('buyer_image', {
+            uri: `file://${data.data.buyer_image}`,
             name: 'photo.jpg',
             type: 'image/jpeg',
           });
         }
         if (data.data.id_proof_image) {
           
-            formData.append('id_proof_image', {
+            formData.append('buyer_id_proof_image', {
               uri: `file://${data.data.id_proof_image}`,
               name: 'photo.jpg',
               type: 'image/jpeg',
@@ -53,82 +54,82 @@ export const supplierPost=createAsyncThunk('supplier/supplierPost',async(data,th
             'Content-Type': 'multipart/form-data',
           },
         };
-        // response = await axios.post('http://13.202.98.144:2000/api/supplier', formData,config);
+        // response = await axios.post('http://13.202.98.144:2000/api/buyer', formData,config);
   
-        const response = await api.post('supplier',formData,config);
+        const response = await api.post('buyer',formData,config);
         return response.data;
     }
     catch(e){
         return thunkApi.rejectWithValue(e.message)
     }
 })
-export const getSupplierById=createAsyncThunk('supplier/supplierById',async(id,thunkApi)=>{
+export const getBuyerById=createAsyncThunk('buyer/buyerById',async(id,thunkApi)=>{
     try{
-    const res=await api.get(`supplier/${id}`);
-      console.log('supplier',res.data)
+    const res=await api.get(`buyer/${id}`);
+      console.log('buyer',res.data)
     return res.data
     }
     catch(e){
         return thunkApi.rejectWithValue(e.message)
     }
 })
-export const supplierSlice=createSlice({
-    name:'supplier',
+export const buyerSlice=createSlice({
+    name:'buyer',
     initialState,
     reducers:{
-        addSupplierSign: (state, action) => {
-            state.orderData = {...state.orderData, supplierSignature: action.payload};
+        addBuyerSign: (state, action) => {
+            state.orderData = {...state.orderData, buyerSignature: action.payload};
           },
         addData: (state, action) => {
             state.orderData = {...state.orderData, data: action.payload};
           }
     },
     extraReducers:(builder)=>{
-        builder.addCase(supplierPost.pending,(state)=>{
+        builder.addCase(buyerPost.pending,(state)=>{
             state.isLoading=true
         })
-        .addCase(supplierPost.fulfilled,(state,action)=>{
+        .addCase(buyerPost.fulfilled,(state,action)=>{
             state.isLoading=false
             state.isSuccess=true
-            state.supplierPostData=action.payload
+            state.buyerPostData=action.payload
         })
-        .addCase(supplierPost.rejected,(state,action)=>{
+        .addCase(buyerPost.rejected,(state,action)=>{
             state.isLoading=false
             state.isError=true
             state.message=action.payload
-            state.supplierPostData=[]
+            state.buyerPostData=[]
         })
-        .addCase(getSupplierList.pending,(state)=>{
+        .addCase(getBuyerList.pending,(state)=>{
           state.isLoading=true
       })
-      .addCase(getSupplierList.fulfilled,(state,action)=>{
+      .addCase(getBuyerList.fulfilled,(state,action)=>{
           state.isLoading=false
           state.isSuccess=true
-          state.supplierList=action.payload
+          state.buyerList=action.payload
       })
-      .addCase(getSupplierList.rejected,(state,action)=>{
+      .addCase(getBuyerList.rejected,(state,action)=>{
           state.isLoading=false
           state.isError=true
           state.message=action.payload
-          state.supplierList=[]
+          state.buyerList=[]
       })
-        .addCase(getSupplierById.pending,(state)=>{
+        .addCase(getBuyerById.pending,(state)=>{
           state.isLoading=true
       })
-      .addCase(getSupplierById.fulfilled,(state,action)=>{
+      .addCase(getBuyerById.fulfilled,(state,action)=>{
           state.isLoading=false
           state.isSuccess=true
-          state.supplierById=action.payload
+          state.buyerById=action.payload
       })
-      .addCase(getSupplierById.rejected,(state,action)=>{
+      .addCase(getBuyerById.rejected,(state,action)=>{
           state.isLoading=false
           state.isError=true
           state.message=action.payload
-          state.supplierById=[]
+          state.buyerById=[]
       })
        
     }
 })
-export const { addSupplierSign,addData} = supplierSlice.actions;
+export const { addBuyerSign,addData} = buyerSlice.actions;
     
-export default supplierSlice.reducer;
+export default buyerSlice.reducer;

@@ -6,7 +6,7 @@ import { addMaterial, getSaleDropdownList } from '../../features/sale/saleSlice'
 import { Button } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 
-const Material = ({navigation}) => {
+const SaleMaterial = ({navigation}) => {
     const [materialDetails, setMaterialDetails] = useState([{material:'', quantity: ''}]);
     const dispatch = useDispatch()
     const {saleDropdownList} = useSelector(state => state.sale)
@@ -134,4 +134,4 @@ const Material = ({navigation}) => {
   )
 }
 
-export default Material
+export default SaleMaterial

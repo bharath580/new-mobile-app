@@ -13,7 +13,7 @@ import {useDispatch} from 'react-redux';
 import { Picker } from '@react-native-picker/picker';
 import { addData } from '../../features/buyer/buyerSlice';
 
-const NewSupplier = ({navigation}) => {
+const NewBuyer = ({navigation}) => {
   const [name, setName] = useState();
   const [address, setAddress] = useState();
   const [phone, setPhone] = useState();
@@ -22,7 +22,7 @@ const NewSupplier = ({navigation}) => {
   const [idProofNumber, setIdProofNumber] = useState();
   const [bankAccountNumber, setBankAccountNumber] = useState();
   const [idProofPhoto, setIdProofPhoto] = useState();
-  const [supplier, setSupplierPhoto] = useState();
+  const [buyer, setBuyerPhoto] = useState();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -40,7 +40,7 @@ const NewSupplier = ({navigation}) => {
           setIdProofPhoto(photoUri);
           console.log(photoUri);
         } else {
-          setSupplierPhoto(photoUri);
+          setBuyerPhoto(photoUri);
         }
       },
     });
@@ -48,7 +48,7 @@ const NewSupplier = ({navigation}) => {
 
   const handleSubmit = () => {
     const data = {
-      supplier_name: name,
+      buyer_name: name,
       address: address,
       age: age,
       phone: phone,
@@ -56,10 +56,10 @@ const NewSupplier = ({navigation}) => {
       id_proof_number: idProofNumber,
       bank_account_number: bankAccountNumber,
       id_proof_image: idProofPhoto,
-      supplier_image: supplier,
+      buyer_image: buyer,
     };
     dispatch(addData(data));
-    navigation.navigate('SupplierSign');
+    navigation.navigate('BuyerSign');
   };
   return (
     <>
@@ -169,11 +169,11 @@ font-bold rounded w-32 mt-1"
           <View className="my-3">
             <Text className="text-lg font-semibold">Supplier Photo</Text>
             <View className="flex-1  my-1">
-              {supplier && (
+              {buyer && (
                 <View className="flex-1 mx-1 my-1">
                   <Image
                     className="w-1/2 h-64 border rounded"
-                    source={{uri: `file://${supplier}`}}
+                    source={{uri: `file://${buyer}`}}
                     style={{flex: 1, resizeMode: 'cover'}}
                   />
                 </View>
@@ -184,7 +184,7 @@ font-bold rounded w-32 mt-1"
                 className="bg-green-500 text-lg hover:bg-green-700
 font-bold rounded w-32 mt-1"
                 textColor="white"
-                onPress={() => handleCapturePhoto('supplier')}>
+                onPress={() => handleCapturePhoto('buyer')}>
                 click photo
               </Button>
             </TouchableOpacity>
@@ -209,4 +209,4 @@ font-bold rounded w-32 mt-1"
   );
 };
 
-export default NewSupplier;
+export default NewBuyer;

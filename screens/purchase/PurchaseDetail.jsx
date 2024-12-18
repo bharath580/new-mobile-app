@@ -153,7 +153,7 @@ const PurchaseDetail = ({route}) => {
                 <Image
                   className="w-48 h-44 mt-2"
                   source={{
-                    uri: `http://192.168.1.2:2000/${orderById.purchase_order[0].supplierSignature}`,
+                    uri: `http://13.202.98.144:2000/${orderById.purchase_order[0].supplierSignature}`,
                   }}
                 />
               )}

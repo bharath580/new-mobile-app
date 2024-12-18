@@ -5,6 +5,8 @@ import  segregationSlice  from "../features/segregation/segregationSlice";
 import  baleSlice  from "../features/bale/baleSlice";
 import  saleSlice  from "../features/sale/saleSlice";
 import  supplierSlice  from "../features/supplier/supplierSlice";
+import  buyerSlice  from "../features/buyer/buyerSlice";
+import  authSlice  from "../features/auth/authSlice";
 
 export const store = configureStore({
     reducer: {
@@ -14,6 +16,8 @@ export const store = configureStore({
       bale:baleSlice,
       sale:saleSlice,
       supplier:supplierSlice,
+      buyer:buyerSlice,
+      auth:authSlice
     },
     
   })

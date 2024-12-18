@@ -77,9 +77,7 @@ const NewSale = ({navigation}) => {
                 className="bg-green-500"
                 title="New Buyer"
                 color="#22c55e"
-                onPress={() => {
-                  // Handle new buyer creation
-                }}
+                onPress={() => {navigation.navigate('NewBuyer')}}
               />
             </TouchableOpacity>
           </View>

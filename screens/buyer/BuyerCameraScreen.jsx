@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Button, Text, LogBox } from 'react-native';
 import { Camera, useCameraDevice, useCameraDevices } from 'react-native-vision-camera';
 
-const CameraScreen = ({ navigation, route }) => {
+const BuyerCameraScreen = ({ navigation, route }) => {
   const { photoType,onPhotoTaken } = route.params;
   const [photo, setPhoto] = useState(null);
   const devices = useCameraDevices();
@@ -51,4 +51,4 @@ const takePicture = async () => {
   );
 };
 
-export default CameraScreen;
+export default BuyerCameraScreen;

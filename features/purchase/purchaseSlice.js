@@ -73,7 +73,8 @@ export const postPurchase = createAsyncThunk(
           'Content-Type': 'multipart/form-data',
         },
       };
-      response = await axios.post('http://192.168.1.2:2000/api/purchase', formData,config);
+      // response = await axios.post('http://13.202.98.144:2000/api/purchase', formData,config);
+      response = await api.post('purchase', formData,config);
 
       console.log('Response data:', response.data);
       return response.data;  // Make sure to return response data here

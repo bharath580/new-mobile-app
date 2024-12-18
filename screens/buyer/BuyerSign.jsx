@@ -4,14 +4,15 @@ import Signature from 'react-native-signature-canvas';
 import {Button} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import { addSupplierSign, supplierPost } from '../../features/supplier/supplierSlice';
+import { addBuyerSign, buyerPost } from '../../features/buyer/buyerSlice';
 
 
-const SupplierSign = ({navigation}) => {
+const BuyerSign = ({navigation}) => {
   const dispatch = useDispatch();
   const [signature, setSignature] = useState(null);
   const signatureRef = useRef(null);
   const { orderData} = useSelector(
-    state => state.supplier
+    state => state.buyer
   );
   useEffect(()=>{
     // console.log('orderData',orderData)
@@ -30,7 +31,7 @@ const SupplierSign = ({navigation}) => {
     try {
       setSignature(base64DataUrl);
       console.log('handle ok', base64DataUrl); // Use base64DataUrl directly
-      dispatch(addSupplierSign(base64DataUrl)); // Dispatch with the provided data
+      dispatch(addBuyerSign(base64DataUrl)); // Dispatch with the provided data
       console.log('action');
     } catch (error) {
       console.error('Error during dispatch:', error);
@@ -51,8 +52,8 @@ const SupplierSign = ({navigation}) => {
 
       // dispatch(balePostData(orderData));
 
-      await dispatch(supplierPost(orderData)).unwrap();
-      navigation.navigate('SupplierList');
+      await dispatch(buyerPost(orderData)).unwrap();
+      navigation.navigate('Buyer');
     } catch (e) {
       console.log(e);
     }
@@ -94,4 +95,4 @@ const SupplierSign = ({navigation}) => {
   );
 };
 
-export default SupplierSign;
+export default BuyerSign;
